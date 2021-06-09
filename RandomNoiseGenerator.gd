@@ -21,6 +21,17 @@ func seed(noise_seed:int = _seed):
 	_state = 0
 	_seed = noise_seed
 
+# Util functions
+func _smooth(i:float, factor:float = 1.0) -> float:
+	var ii = int(i)
+	var f = i - ii
+	var smoothf = (f*f*(3.0-2.0*f))
+	if factor >= 1.0:
+		return ii + smoothf
+	elif factor <= 0.0:
+		return ii + f
+	return ii + lerp(f, smoothf, factor)
+
 # Functions that do not modify state
 
 func inoise(i:int, noise_seed:int = _seed) -> int:
@@ -57,12 +68,7 @@ func jitter_2d(x:float, y:float, factor:float = 1.0, noise_seed:int = _seed) -> 
 	var res = random_direction_2d(x,y, noise_seed) * noise_2d(x,y, noise_seed) * factor
 	return Vector2(x, y) + res
 
-func smooth_noise(i:float, width:int = MAX_INT, noise_seed:int = _seed) -> float:
-	var a = noise(i, noise_seed)
-	var b = noise((int(i)+1) % width, noise_seed)
-	return lerp(a, b, i-int(i))
-
-func perlin_2d(x:float, y:float, width:int = MAX_INT, height:int = MAX_INT, noise_seed:int = _seed) -> float:
+func perlin_2d(x:float, y:float, smoothing:float = 1.0, width:int = MAX_INT, height:int = MAX_INT, noise_seed:int = _seed) -> float:
 	var ix:int = int(x)
 	var iy:int = int(y)
 	var nx:int = (ix + 1)
@@ -87,12 +93,20 @@ func perlin_2d(x:float, y:float, width:int = MAX_INT, height:int = MAX_INT, nois
 	var v3 = d3.dot(g3)
 	var v4 = d4.dot(g4)
 	
+	var sx = _smooth(x-ix, smoothing)
+	var sy = _smooth(y-iy, smoothing)
+	
 	# Bilinear interpolate towards the actual direction
-	var l1 = lerp(v1, v2, x-ix)
-	var l2 = lerp(v3, v4, x-ix)
-	return clamp(lerp(l1, l2, y-iy), -1, 1)
+	var l1 = lerp(v1, v2, sx)
+	var l2 = lerp(v3, v4, sx)
+	return clamp(lerp(l1, l2, sy), -1, 1)
 
-func value_noise_2d(x:float, y:float, width:int = MAX_INT, height:int = MAX_INT, noise_seed:int = _seed) -> float:
+func value_noise(i:float, smoothing:float = 1.0, width:int = MAX_INT, noise_seed:int = _seed) -> float:
+	var a = noise(i, noise_seed)
+	var b = noise((int(i)+1) % width, noise_seed)
+	return lerp(a, b, _smooth(i-int(i), smoothing))
+
+func value_noise_2d(x:float, y:float, smoothing:float = 1.0, width:int = MAX_INT, height:int = MAX_INT, noise_seed:int = _seed) -> float:
 	var ix:int = int(x) % width
 	var iy:int = int(y) % height
 	var nx:int = (ix + 1) % width
@@ -102,9 +116,12 @@ func value_noise_2d(x:float, y:float, width:int = MAX_INT, height:int = MAX_INT,
 	var v3 = noise_2d(ix, ny, noise_seed)
 	var v4 = noise_2d(nx, ny, noise_seed)
 	
-	var l1 = lerp(v1, v2, x - int(x))
-	var l2 = lerp(v3, v4, x - int(x))
-	return clamp(lerp(l1, l2, y - int(y)), -1, 1)
+	var sx = _smooth(x-int(x), smoothing)
+	var sy = _smooth(y-int(y), smoothing)
+	
+	var l1 = lerp(v1, v2, sx)
+	var l2 = lerp(v3, v4, sx)
+	return clamp(lerp(l1, l2, sy), -1, 1)
 
 
 # Functions that modify state
