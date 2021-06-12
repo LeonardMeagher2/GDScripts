@@ -1,6 +1,12 @@
 extends Node
 class_name Pathing
 
+# A generic weighted graph, that allows you to do dijkstra or astar
+# neighbor, cost and distance functions need to be provided to it 
+# this allows complex behavior, and the ability to not only use this for
+# path finding in a 2d or 3d space, but also through things like Planners for GOAP (goal oriented action planning)
+
+
 class DijkstraMap extends Reference:
 	var costs:Dictionary
 	var came_from:Dictionary
@@ -49,13 +55,17 @@ static func build_path(from, map:DijkstraMap) -> DijkstraPath:
 			
 	return DijkstraPath.new(path, total_cost)
 
-static func dijkstra(start, goals, options:Dictionary, early_exit:bool = false) -> DijkstraMap:
+static func dijkstra(goals, options:Dictionary, early_exit:bool = false) -> DijkstraMap:
 	
 	var get_neighbors:FuncRef = options.get("get_neighbors")
 	var get_cost:FuncRef = options.get("get_cost", null)
 	var get_distance:FuncRef = options.get("get_distance", null)
 	var distance_factor:float = options.get("distance_factor", 0.01)
 	var max_cost:float = options.get("max_cost", INF)
+	var start = options.get("start", null)
+
+	if get_distance and start == null:
+		warn
 	
 	var que = PriorityQueue.new()
 	var came_from = {}
@@ -70,7 +80,7 @@ static func dijkstra(start, goals, options:Dictionary, early_exit:bool = false) 
 	while not que.empty():
 		var current = que.pop_front()
 		
-		if early_exit and current == start:
+		if early_exit and start != null and current == start:
 			break
 		
 		for next in get_neighbors.call_func(current):
@@ -89,7 +99,7 @@ static func dijkstra(start, goals, options:Dictionary, early_exit:bool = false) 
 				cost_so_far[next] = new_cost
 				if new_cost < max_cost:
 					var smallest_distance = 0.0
-					if get_distance:
+					if start != null and get_distance:
 						smallest_distance = INF
 						for g in goals:
 							var distance = get_distance.call_func(start, next, g)
@@ -102,5 +112,6 @@ static func dijkstra(start, goals, options:Dictionary, early_exit:bool = false) 
 	return DijkstraMap.new(cost_so_far, came_from)
 
 static func astar(from, to, options:Dictionary) -> DijkstraPath:
+	# from will be a single starting node, and to can be an array
 	var map = dijkstra(from, to, options, true)
 	return build_path(from, map)
