@@ -4,7 +4,8 @@ class_name ActivePhysicalBone
 export var enabled:bool = true
 export var translation_force:float = 100.0
 export var torque_force:float = 14.0
-export var damping:float = 0.1
+export var linear_damping:float = 0.9
+export var angular_damping:float = 0.2
 export(float, 0.0, 1.0) var align_globally:float = 1.0
 
 onready var skeleton:Skeleton = get_parent()
@@ -28,10 +29,8 @@ func _physics_process(delta):
 		var state = PhysicsServer.body_get_direct_state(get_rid())
 		var bone_id = get_bone_id()
 		
-		var local_angular_velocity = state.transform.xform_inv(state.angular_velocity) / state.inverse_inertia
-		
-		state.add_central_force(-state.linear_velocity * damping )
-		state.add_torque(-local_angular_velocity * damping )
+		state.add_central_force(-state.linear_velocity  * linear_damping)
+		state.add_torque(-state.angular_velocity * angular_damping)
 		
 		var parent_pose:Transform
 		var local_pose:Transform
@@ -45,8 +44,8 @@ func _physics_process(delta):
 			state.add_central_force(((parent_pose * local_pose).origin - local_transform.origin) * translation_force)
 		else:
 			var root_bone_pose = skeleton.get_bone_global_pose(root_bone_id).interpolate_with(Transform(), align_globally)
-			parent_pose = root_bone_pose * skeleton_transfrom * skeleton.get_bone_global_pose_no_override(parent_id)
-			local_transform = parent_pose.affine_inverse() * state.transform
+			parent_pose = skeleton_transfrom * skeleton.get_bone_global_pose_no_override(parent_id)
+			local_transform = (root_bone_pose * parent_pose).affine_inverse() * state.transform
 			local_pose = skeleton.get_bone_rest(bone_id) * skeleton.get_bone_pose(bone_id) * body_offset
 		
 		var desired_rotation = (local_transform.affine_inverse() * local_pose).basis
@@ -56,6 +55,7 @@ func _physics_process(delta):
 		if angle and not (is_inf(angle) or is_nan(angle)):
 			var axis = Vector3(desired_rotquat.x, desired_rotquat.y, desired_rotquat.z) * (1.0/sin(angle*0.5))
 			var torque = axis * angle
+				
 			torque = state.transform.basis.xform(torque)
 			state.add_torque(torque * torque_force)
 		
