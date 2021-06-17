@@ -28,6 +28,7 @@ func _physics_process(delta):
 		var state = PhysicsServer.body_get_direct_state(get_rid())
 		var bone_id = get_bone_id()
 		
+		# applying damping to the body can supress jitter
 		state.add_central_force(-state.linear_velocity  * linear_damping)
 		state.add_torque(-state.angular_velocity * angular_damping)
 		
@@ -38,31 +39,47 @@ func _physics_process(delta):
 		if parent_id == -1:
 			parent_pose = skeleton_transfrom
 			local_transform = parent_pose.affine_inverse() * state.transform
+			# Get where the bone would be globally in the current animation
 			local_pose = skeleton.get_bone_global_pose_no_override(bone_id) * body_offset
 		else:
 			var root_bone_pose = skeleton.get_bone_global_pose(root_bone_id).interpolate_with(Transform(), align_globally)
+			
+			# Getting the parent bone allows all bone positions to be relative to the position and rotation of the parent
 			parent_pose = skeleton_transfrom * skeleton.get_bone_global_pose_no_override(parent_id)
+			
+			# When align_globally is 0, we align all transforms relative to the root bone, instead of the global animation position
 			local_transform = (root_bone_pose * parent_pose).affine_inverse() * state.transform
+			
+			# Get where the bone would be locally in the current animation
 			local_pose = skeleton.get_bone_rest(bone_id) * skeleton.get_bone_pose(bone_id) * body_offset
 			
+		# We apply back our global position to our local transforms so we can get the difference in global space
+		var final_transform:Transform = parent_pose * local_transform
+		var final_pose:Transform = parent_pose * local_pose
 		
-		var final_parent_pose = parent_pose.interpolate_with(Transform(parent_pose.basis, Vector3.ZERO), 1.0 - align_globally)
-		var final_transform:Transform = final_parent_pose * local_transform
-		var final_pose:Transform = final_parent_pose * local_pose
+		var diff = (final_transform.affine_inverse() * final_pose)
 		
-		if align_globally and parent_id == -1:
-				state.add_central_force((final_pose.origin - final_transform.origin) / delta / state.inverse_mass * max_force * force_multiplier * align_globally)
+		var force = ( max_force / state.inverse_mass) * force_multiplier;
 		
-		var desired_rotquat = (final_transform.affine_inverse() * final_pose).basis.get_rotation_quat()
+		if parent_id == -1:
+			# The root bone will try to interpolate it's position to where it would be if it was not simulating physics
+			var target_position = final_pose.origin 
+			# add velocity to the current position to slow down sooner rather than over shooting
+			var current_position = final_transform.origin + state.linear_velocity * delta
+			# We remove divide force by delta to make the force independent of time (making it stronger)
+			state.add_central_force((target_position - current_position) * (force / delta) * align_globally)
 		
-		var angle = 2.0 * acos(desired_rotquat.w)
+		# We only care about the rotation component
+		var desired_rotation = diff.basis.get_rotation_quat()
+		# The w component of the quat can describe the angle around the axis
+		var angle = 2.0 * acos(desired_rotation.w)
 		
 		if angle and not (is_inf(angle) or is_nan(angle)):
-			var axis:Vector3 = Vector3(desired_rotquat.x, desired_rotquat.y, desired_rotquat.z) * (1.0/sin(angle*0.5))
-			var torque:Vector3 = axis * angle
-			
-			torque = state.transform.basis.xform(torque)
-			
-			state.add_torque(torque * max_force * force_multiplier  / state.inverse_mass)
-		
-		state.integrate_forces()
+			var axis:Vector3 = Vector3(desired_rotation.x, desired_rotation.y, desired_rotation.z) * (1.0/sin(angle*0.5))
+			# Now that we have the axis and angle of rotation, we just need to multiply them to get the torque
+			var torque:Vector3 = (axis * angle) 
+			# torque is currently in relative space, but we need to transform it to be a global torque
+			# so we just transform it by our current rotation
+			torque = state.transform.basis.xform(torque) 
+			# we also subtract our current angular velocity to slow down
+			state.add_torque(torque * force - state.angular_velocity * delta)
