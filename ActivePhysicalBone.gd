@@ -29,7 +29,7 @@ func _physics_process(delta):
 		var bone_id = get_bone_id()
 		
 		# applying damping to the body can supress jitter
-		state.add_central_force(-state.linear_velocity  * linear_damping)
+		state.add_central_force(-state.linear_velocity * linear_damping)
 		state.add_torque(-state.angular_velocity * angular_damping)
 		
 		var parent_pose:Transform
@@ -66,7 +66,7 @@ func _physics_process(delta):
 			var target_position = final_pose.origin 
 			# add velocity to the current position to slow down sooner rather than over shooting
 			var current_position = final_transform.origin + state.linear_velocity * delta
-			# We remove divide force by delta to make the force independent of time (making it stronger)
+			# We divide force by delta to make the force independent of time (making it stronger)
 			state.add_central_force((target_position - current_position) * (force / delta) * align_globally)
 		
 		# We only care about the rotation component
