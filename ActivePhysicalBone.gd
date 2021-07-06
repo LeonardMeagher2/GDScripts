@@ -1,6 +1,8 @@
 extends PhysicalBone
 class_name ActivePhysicalBone
 
+# Enables a PhysicalBone to track to the animation currently playing on the parent skeleton
+
 export var enabled:bool = true
 export(float, 0.0, 1.0) var force_multiplier = 1.0
 export var max_force:float = 14.0

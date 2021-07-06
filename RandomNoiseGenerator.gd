@@ -1,6 +1,8 @@
 extends Reference
 class_name RandomNoiseGenerator
 
+# Noise functions and Noise based random number generator based on talks from GDC's Math for programmers
+
 const PG = PoolVector2Array([
 	Vector2(1,1), Vector2(-1,1),
 	Vector2(1,-1), Vector2(-1,-1),
