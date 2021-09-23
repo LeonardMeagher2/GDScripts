@@ -1,4 +1,4 @@
-extends Reference
+extends Resource
 class_name DijkstraMapGenerator
 
 # A generic dynamic weighted graph, that allows you to do dijkstra or astar on any dataset.
