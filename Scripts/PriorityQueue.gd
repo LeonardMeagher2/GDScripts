@@ -8,6 +8,7 @@ var map:Dictionary
 var current_size:int
 
 class HeapData extends Reference:
+	# data structure for heap
 	var priority:float = 0.0
 	var data
 	var index:int
@@ -15,24 +16,28 @@ class HeapData extends Reference:
 		return data
 
 func _init():
+	# initialize the heap
 	var empty = HeapData.new()
 	heap = [empty]
 	map[empty] = [0]
 	current_size = 0
 	
 func _map_add(data,i:int):
+	# add a new data to the map
 	if map.has(data):
 		if not map[data].has(i):
 			map[data].append(i)
 	else:
 		map[data] = [i]
 func _map_remove(data, i:int):
+	# remove a data from the map
 	if map.has(data) and map[data].has(i):
 		map[data].erase(i)
 		if map[data].size() == 0:
 			map.erase(data)
 		
 func _swap(ia:int,ib:int):
+	# swap two elements in the heap
 	var tmp = heap[ia]
 	heap[ia] = heap[ib]
 	heap[ib] = tmp
@@ -49,6 +54,7 @@ func _child(i:int, x:int):
 	return i * 2 + x
 
 func _percUp(i:int):
+	# percolate up the heap
 	while _parent(i) > 0:
 		if heap[i].priority < heap[_parent(i)].priority:
 			_swap(_parent(i),i)
@@ -66,6 +72,7 @@ func insert(priority:float, data):
 	return heap_data
 
 func _percDown(i:int):
+	# percolate down the heap
 	while (_child(i,0)) <= current_size:
 		var mc = _minChild(i)
 		if heap[i].priority > heap[mc].priority:
@@ -73,6 +80,7 @@ func _percDown(i:int):
 		i = mc
 
 func _minChild(i:int):
+	# find the child with the lowest priority
 	if _child(i,1) > current_size:
 		return _child(i,0)
 	else:
@@ -82,6 +90,7 @@ func _minChild(i:int):
 			return _child(i,1)
 
 func pop_front():
+	# return the lowest priority element
 	var retval = heap[1].data
 	
 	_swap(1,current_size)
@@ -92,14 +101,17 @@ func pop_front():
 	return retval
 
 func pop_back():
+	# return the highest priority element
 	var retval = heap.pop_back().data
 	_map_remove(retval,current_size)
 	current_size -= 1
 	return retval
 	
 func front():
+	# peak at the lowest priority element
 	return heap[1].data
 func back():
+	# peak at the highest priority element
 	return heap.back()
 	
 func remove(data):

@@ -1,6 +1,8 @@
 extends Node
 class_name Pathing
 
+# Requires: PriorityQueue.gd and Task.gd
+
 signal get_context(task)
 signal get_goals(task)
 signal get_neighbors(task)
@@ -89,6 +91,7 @@ func search(max_total_cost:float = INF, early_break:bool = true) -> Dictionary:
 	
 	# We use a priority queue which is a binary heap
 	# it helps sorting the values as they go in so the search is faster.
+	# when calling pop_front we get the lowest cost node.
 	var que = PriorityQueue.new()
 	# Results are a map of values to PathingNodes
 	var map = {}
@@ -182,6 +185,7 @@ func search(max_total_cost:float = INF, early_break:bool = true) -> Dictionary:
 	# 	print(n)
 	# 	n = n.next
 	# -----------
+
 	var result = {
 		"start": start,
 		"map": map,
