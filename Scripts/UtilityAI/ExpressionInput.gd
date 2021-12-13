@@ -8,7 +8,7 @@ var _valid_expression:bool = false
 
 func set_expression(value:String):
 	expression = value
-	_valid_expression = _expression_object.parse(value, ["agent", "target"]) == OK
+	_valid_expression = _expression_object.parse(value, ["agent", "target", "current_time"]) == OK
 
 func get_value(context:UAIContext) -> float:
 	var value = 0.0
@@ -20,7 +20,7 @@ func get_value(context:UAIContext) -> float:
 	var target = context.target_ref.get_ref()
 		
 	if agent and target:
-		value = _expression_object.execute([agent, target])
+		value = _expression_object.execute([agent, target, context.current_time])
 		if _expression_object.has_execute_failed():
 			value = 0.0
 		else:
