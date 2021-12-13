@@ -15,7 +15,7 @@ class Score extends Reference:
 	
 func evaluate_preconditions(context:UAIContext) -> bool:
 	var result = true
-	# If one precondition is false we exit early (or if a missplaced resource is added)
+	# If one precondition is false we exit early
 	for input in preconditions:
 		if not input is UAIInput:
 			printerr("Behavior precondition must be of type UAIInput")

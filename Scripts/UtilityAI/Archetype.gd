@@ -9,7 +9,7 @@ func set_behavior_sets(value:Array):
 		if behavior_set is UAIBehaviorSet:
 			behavior_sets.append(behavior_set)
 		else:
-			printerr("Achetypes can only contain BehaviorSets")
+			printerr("Archetypes can only contain BehaviorSets")
 
 
 func choose_behavior(agent, targets:Array) -> UAIContext:
@@ -43,10 +43,7 @@ func choose_behavior(agent, targets:Array) -> UAIContext:
 				if behavior.evaluate_preconditions(context):
 					var score:UAIBehavior.Score = behavior.score(context)
 					context.behavior_score = score
-					queue.insert(score.final_score, context)
+					if score.final_score > 0.0:
+						queue.insert(score.final_score, context)
 	
-	var winner:UAIContext = queue.front()
-	if winner.behavior_score.final_score > 0.0:
-		return winner
-	
-	return null
+	return queue.front()
