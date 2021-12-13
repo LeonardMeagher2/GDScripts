@@ -28,11 +28,12 @@ func choose_behavior(agent, targets:Array) -> UAIContext:
 			if not behavior or behavior.enabled == false:
 				continue
 				
-			if behavior.priority > highest_priority:
-				queue = PriorityQueue.new()
-				highest_priority = behavior.priority
-			elif behavior.priority < highest_priority:
+			
+			if behavior.priority < highest_priority:
+				# The queue is set to a higher priority than the current behavior
 				continue
+			
+			var behvior_used:bool = false
 
 			for target in targets:
 				var context = UAIContext.new()
@@ -44,6 +45,12 @@ func choose_behavior(agent, targets:Array) -> UAIContext:
 					var score:UAIBehavior.Score = behavior.score(context)
 					context.behavior_score = score
 					if score.final_score > 0.0:
+						# Only consider changing the highest_priority if the behavior may have a real chance of being used
+						# This should only happen once for the first item with a higher priority than everything else
+						if not behvior_used and behavior.priority > highest_priority:
+							highest_priority = behavior.priority
+							queue = PriorityQueue.new() # Everything in the queue currently has a lower priority, get rid of it
+							behvior_used = true
 						queue.insert(score.final_score, context)
 	
 	return queue.front()
