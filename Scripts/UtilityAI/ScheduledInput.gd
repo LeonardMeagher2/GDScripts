@@ -2,11 +2,10 @@ extends UAIInput
 
 # If you only have a start time, returns 1.0 when passed that time
 # If you only have an end time, returns 1.0 until passed that time
-# If you have a start and end time, return 0.0 when outside of that time and a value in seconds
+# If you have a start and end time, return 0.0 when outside of that time and 0-1 when inside schedule
 
 export var start_time:Resource
 export var end_time:Resource
-export var normalized:bool = true
 
 func get_value(context:UAIContext) -> float:
 	start_time = start_time as Time
@@ -22,9 +21,7 @@ func get_value(context:UAIContext) -> float:
 	
 	if start_time and end_time:
 		var minimum = start_time.get_time()
-		value = (context.current_time - minimum)
-		if normalized:
-			var maximum = end_time.get_time()
-			value /= (maximum - minimum)
+		var maximum = end_time.get_time()
+		value = (context.current_time - minimum) / (maximum - minimum)
 	
 	return value
