@@ -12,7 +12,7 @@ func set_behavior_sets(value:Array):
 			printerr("Archetypes can only contain BehaviorSets")
 
 
-func get_best_behaviors(agent, targets:Array, count:int = 1) -> Array:
+func get_best_behaviors(agent, targets:Array, current_time:Time, count:int = 1) -> Array:
 	var queue = PriorityQueue.new()
 	
 	var highest_priority:int = 0
@@ -40,6 +40,7 @@ func get_best_behaviors(agent, targets:Array, count:int = 1) -> Array:
 				context.behavior = behavior
 				context.target = weakref(target)
 				context.agent = weakref(agent)
+				context.current_time = current_time
 				
 				if behavior.evaluate_preconditions(context):
 					var score:UAIBehavior.Score = behavior.score(context)

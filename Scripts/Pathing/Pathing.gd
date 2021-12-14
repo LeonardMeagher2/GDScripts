@@ -48,6 +48,12 @@ class PathingNode extends Reference:
 			return "{0} -> {1}".format([self, next.print_path()])
 		return str(self)
 
+static func _dedupe_array(arr:Array) -> Array:
+	var map = {}
+	for item in arr:
+		map[item] = null
+	return map.keys()
+
 func _fire_task(task_name, data = {}):
 	# Send an task to signal listeners and children
 	
@@ -122,7 +128,7 @@ func search(max_total_cost:float = INF, early_break:bool = true) -> Dictionary:
 		}), "completed")
 		if not neighbors:
 			continue
-		neighbors = Utils.dedupe_array(neighbors)
+		neighbors = _dedupe_array(neighbors)
 		
 		for next in neighbors:
 			# The cost of our new item will be the previous items cost + the cost for this one.

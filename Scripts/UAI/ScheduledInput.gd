@@ -14,14 +14,15 @@ func get_value(context:UAIContext) -> float:
 		return 0.0
 	
 	var value = 1.0
-	if start_time and context.current_time < start_time.get_time():
+	var current_time = context.current_time.get_time()
+	if start_time and current_time < start_time.get_time():
 		return 0.0
-	if end_time and context.current_time > end_time.get_time():
+	if end_time and current_time > end_time.get_time():
 		return 0.0
 	
 	if start_time and end_time:
 		var minimum = start_time.get_time()
 		var maximum = end_time.get_time()
-		value = (context.current_time - minimum) / (maximum - minimum)
+		value = (current_time - minimum) / (maximum - minimum)
 	
 	return value
