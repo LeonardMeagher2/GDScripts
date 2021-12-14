@@ -1,7 +1,7 @@
 extends Reference
 class_name PriorityQueue
 
-# Priority Queue implementation with binary heap
+# Priority Queue implementation with binary min-heap
 
 var heap:Array
 var map:Dictionary
@@ -14,6 +14,13 @@ class HeapData extends Reference:
 	var index:int
 	func key():
 		return data
+		
+	func _to_string():
+		return "({index}, {priority}, {data})".format({
+			"priority": priority,
+			"data": data,
+			"index": index
+		})
 
 func _init():
 	# initialize the heap
@@ -53,12 +60,30 @@ func _parent(i:int):
 func _child(i:int, x:int):
 	return i * 2 + x
 
+func _minChild(i:int):
+	# find the child with the lowest priority
+	if _child(i,1) > current_size:
+		return _child(i,0)
+	else:
+		if heap[_child(i,0)].priority < heap[_child(i,1)].priority:
+			return _child(i,0)
+		else:
+			return _child(i,0)
+
 func _percUp(i:int):
 	# percolate up the heap
 	while _parent(i) > 0:
 		if heap[i].priority < heap[_parent(i)].priority:
 			_swap(_parent(i),i)
 		i = _parent(i)
+
+func _percDown(i:int):
+	# percolate down the heap
+	while _child(i,0) <= current_size:
+		var mc = _minChild(i)
+		if heap[i].priority > heap[mc].priority:
+			_swap(i,mc)
+		i = mc
 
 func insert(priority:float, data):
 	var heap_data = HeapData.new()
@@ -71,24 +96,6 @@ func insert(priority:float, data):
 	_percUp(current_size)
 	return heap_data
 
-func _percDown(i:int):
-	# percolate down the heap
-	while (_child(i,0)) <= current_size:
-		var mc = _minChild(i)
-		if heap[i].priority > heap[mc].priority:
-			_swap(i,mc)
-		i = mc
-
-func _minChild(i:int):
-	# find the child with the lowest priority
-	if _child(i,1) > current_size:
-		return _child(i,0)
-	else:
-		if heap[i*2].priority < heap[i*2+1].priority:
-			return _child(i,0)
-		else:
-			return _child(i,1)
-
 func pop_front():
 	# return the lowest priority element
 	var retval = heap[1].data
@@ -99,20 +106,10 @@ func pop_front():
 	current_size -= 1
 	_percDown(1)
 	return retval
-
-func pop_back():
-	# return the highest priority element
-	var retval = heap.pop_back().data
-	_map_remove(retval,current_size)
-	current_size -= 1
-	return retval
 	
 func front():
 	# peak at the lowest priority element
 	return heap[1].data
-func back():
-	# peak at the highest priority element
-	return heap.back()
 	
 func remove(data):
 	if map.has(data):
@@ -125,13 +122,12 @@ func remove(data):
 
 func empty():
 	return current_size < 1
+	
+func size() -> int:
+	return current_size
 
 func _to_string():
 	var s = PoolStringArray()
 	for i in range(1,current_size+1):
-		var heap_data = heap[i]
-		s.append("({priority}, {data})".format({
-			"priority": heap_data.priority,
-			"data": heap_data.data
-		}))
+		s.append(str(heap[i]))
 	return s.join(',')

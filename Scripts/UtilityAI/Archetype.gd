@@ -12,7 +12,7 @@ func set_behavior_sets(value:Array):
 			printerr("Archetypes can only contain BehaviorSets")
 
 
-func choose_behavior(agent, targets:Array) -> UAIContext:
+func get_best_behaviors(agent, targets:Array, count:int = 1) -> Array:
 	var queue = PriorityQueue.new()
 	
 	var highest_priority:int = 0
@@ -53,4 +53,13 @@ func choose_behavior(agent, targets:Array) -> UAIContext:
 							behvior_used = true
 						queue.insert(score.final_score, context)
 	
-	return queue.front()
+	# Give the top N behaviors, useful for randomly picking one of the best
+	var results = []
+	var n = min(count, queue.size())
+	if count == -1:
+		n = queue.size()
+	
+	for i in n:
+		results.append(queue.pop_front())
+	
+	return results
