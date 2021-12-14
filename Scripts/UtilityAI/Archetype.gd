@@ -55,10 +55,9 @@ func get_best_behaviors(agent, targets:Array, count:int = 1) -> Array:
 	
 	# Give the top N behaviors, useful for randomly picking one of the best
 	var results = []
-	var n = min(count, queue.size())
-	if count == -1:
+	var n:int = clamp(count, 0, queue.size())
+	if not n:
 		n = queue.size()
-	
 	for i in n:
 		results.append(queue.pop_front())
 	
