@@ -12,7 +12,7 @@ class Score extends Reference:
 	var considerations:Dictionary
 	var initial_weight:float
 	var final_score:float
-	
+
 func evaluate_preconditions(context:UAIContext) -> bool:
 	var result = true
 	# If one precondition is false we exit early
@@ -42,4 +42,3 @@ func score(context:UAIContext) -> Score:
 		
 	scores.final_score = result
 	return scores
-	
