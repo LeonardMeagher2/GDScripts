@@ -14,7 +14,7 @@ func get_value(context:UAIBehaviorContext) -> float:
 		return 0.0
 	
 	var value = 1.0
-	var current_time = context.current_time.get_time()
+	var current_time = context.blackboard.current_time.get_time()
 	if start_time and current_time < start_time.get_time():
 		return 0.0
 	if end_time and current_time > end_time.get_time():
