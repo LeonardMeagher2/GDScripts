@@ -1,11 +1,12 @@
 extends Reference
 class_name PriorityQueue
 
-# Priority Queue implementation with binary min-heap
+# Priority Queue implementation with binary heap
 
 var heap:Array
 var map:Dictionary
 var current_size:int
+var _minimum:bool = true # change if it's a minheap or maxheap
 
 class HeapData extends Reference:
 	# data structure for heap
@@ -22,12 +23,13 @@ class HeapData extends Reference:
 			"index": index
 		})
 
-func _init():
+func _init(minimum:bool = false):
 	# initialize the heap
 	var empty = HeapData.new()
 	heap = [empty]
 	map[empty] = [0]
 	current_size = 0
+	_minimum = minimum
 	
 func _map_add(data,i:int):
 	# add a new data to the map
@@ -60,12 +62,17 @@ func _parent(i:int):
 func _child(i:int, x:int):
 	return i * 2 + x
 
+func _should_move_up(a,b):
+	if _minimum:
+		return a < b
+	return a > b
+
 func _minChild(i:int):
 	# find the child with the lowest priority
 	if _child(i,1) > current_size:
 		return _child(i,0)
 	else:
-		if heap[_child(i,0)].priority < heap[_child(i,1)].priority:
+		if _should_move_up(heap[_child(i,0)].priority, heap[_child(i,1)].priority):
 			return _child(i,0)
 		else:
 			return _child(i,0)
@@ -73,7 +80,7 @@ func _minChild(i:int):
 func _percUp(i:int):
 	# percolate up the heap
 	while _parent(i) > 0:
-		if heap[i].priority < heap[_parent(i)].priority:
+		if _should_move_up(heap[i].priority, heap[_parent(i)].priority):
 			_swap(_parent(i),i)
 		i = _parent(i)
 
@@ -81,7 +88,7 @@ func _percDown(i:int):
 	# percolate down the heap
 	while _child(i,0) <= current_size:
 		var mc = _minChild(i)
-		if heap[i].priority > heap[mc].priority:
+		if not _should_move_up(heap[i].priority, heap[mc].priority):
 			_swap(i,mc)
 		i = mc
 
