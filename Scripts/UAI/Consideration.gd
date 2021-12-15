@@ -12,7 +12,7 @@ class Score extends Reference:
 	var value:float = 0.0
 	var final_score:float = 0.0
 
-func score(context:UAIContext) -> Score:
+func score(context:UAIBehaviorContext) -> Score:
 	
 	var score = Score.new()
 	

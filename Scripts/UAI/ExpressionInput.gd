@@ -10,7 +10,7 @@ func set_expression(value:String):
 	expression = value
 	_valid_expression = _expression_object.parse(value, ["agent", "target", "current_time"]) == OK
 
-func get_value(context:UAIContext) -> float:
+func get_value(context:UAIBehaviorContext) -> float:
 	var value = 0.0
 	
 	if not _valid_expression:

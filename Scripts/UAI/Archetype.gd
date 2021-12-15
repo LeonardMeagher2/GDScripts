@@ -19,13 +19,13 @@ func get_best_behaviors(agent, targets:Array, current_time:Time, count:int = 1) 
 	for behavior_set in behavior_sets:
 		behavior_set = behavior_set as UAIBehaviorSet
 		
-		if not behavior_set or behavior_set.enabled == false:
+		if not behavior_set:
 			continue
 		
 		for behavior in behavior_set.behaviors:
 			behavior = behavior as UAIBehavior
 			
-			if not behavior or behavior.enabled == false:
+			if not behavior:
 				continue
 				
 			
@@ -36,10 +36,10 @@ func get_best_behaviors(agent, targets:Array, current_time:Time, count:int = 1) 
 			var behvior_used:bool = false
 
 			for target in targets:
-				var context = UAIContext.new()
+				var context = UAIBehaviorContext.new()
 				context.behavior = behavior
-				context.target = weakref(target)
-				context.agent = weakref(agent)
+				context.target_ref = weakref(target)
+				context.agent_ref = weakref(agent)
 				context.current_time = current_time
 				
 				if behavior.evaluate_preconditions(context):

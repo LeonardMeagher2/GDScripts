@@ -7,7 +7,7 @@ class_name UAIDoAction
 
 export var do_on_target:bool = false
 
-func execute(context:UAIContext) -> ActionExecution:
+func execute(context:UAIBehaviorContext) -> ActionExecution:
 	
 	var execution = ActionExecution.new(self, context)
 	

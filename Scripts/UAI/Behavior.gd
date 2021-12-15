@@ -1,7 +1,6 @@
 extends Resource
 class_name UAIBehavior
 
-export var enabled:bool = true
 export(int, "Normal", "High") var priority:int = 0
 export(Array, Resource) var preconditions:Array
 export(Array, Resource) var considerations:Array
@@ -13,7 +12,7 @@ class Score extends Reference:
 	var initial_weight:float
 	var final_score:float
 
-func evaluate_preconditions(context:UAIContext) -> bool:
+func evaluate_preconditions(context:UAIBehaviorContext) -> bool:
 	var result = true
 	# If one precondition is false we exit early
 	for input in preconditions:
@@ -25,12 +24,17 @@ func evaluate_preconditions(context:UAIContext) -> bool:
 			break
 	return result
 
-func score(context:UAIContext) -> Score:
+func score(context:UAIBehaviorContext) -> Score:
 	
 	var scores = Score.new()
+	scores.initial_weight = weight
+	if considerations.size() == 0:
+		scores.final_score = weight
+		return scores
+	
 	var compensation = 1.0 - (1.0 / considerations.size())
 	var result = weight
-	scores.initial_weight = weight
+	
 	
 	for consideration in considerations:
 		var score:UAIConsideration.Score = consideration.score(context)

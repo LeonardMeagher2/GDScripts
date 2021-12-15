@@ -11,7 +11,7 @@ func _run(sequence_execution) -> void:
 			yield(execution, "completed")
 	sequence_execution.complete()
 
-func execute(context:UAIContext) -> ActionExecution:
+func execute(context:UAIBehaviorContext) -> ActionExecution:
 	if actions.size():
 		var sequence_execution = ActionExecution.new(self, context)
 		sequence_execution.connect("completed", self, "emit_signal", ["completed"], CONNECT_ONESHOT)

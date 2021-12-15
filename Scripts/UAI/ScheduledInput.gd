@@ -7,7 +7,7 @@ extends UAIInput
 export var start_time:Resource
 export var end_time:Resource
 
-func get_value(context:UAIContext) -> float:
+func get_value(context:UAIBehaviorContext) -> float:
 	start_time = start_time as Time
 	end_time = end_time as Time
 	if not (start_time or end_time):
