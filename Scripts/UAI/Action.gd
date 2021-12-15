@@ -1,7 +1,7 @@
 extends Resource
 class_name UAIAction
 
-signal completed()
+signal completed(execution)
 
 class ActionExecution extends Reference:
 	signal completed()
@@ -29,6 +29,6 @@ func execute(context:UAIBehaviorContext) -> ActionExecution:
 	# The base action can be used like a global event
 	var execution = ActionExecution.new(self, context)
 	# not all the necessary since we call complete right away, but this is just an example of what should be done
-	execution.connect("completed", self, "emit_signal", ["completed"], CONNECT_ONESHOT)
+	execution.connect("completed", self, "emit_signal", ["completed", execution], CONNECT_ONESHOT)
 	execution.complete()
 	return execution

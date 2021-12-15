@@ -22,6 +22,7 @@ func execute(context:UAIBehaviorContext) -> ActionExecution:
 		agent.do_action(execution)
 		return execution
 	
-	return null
+	execution.complete()
+	return execution
 	
 	

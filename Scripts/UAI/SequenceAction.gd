@@ -14,7 +14,7 @@ func _run(sequence_execution) -> void:
 func execute(context:UAIBehaviorContext) -> ActionExecution:
 	if actions.size():
 		var sequence_execution = ActionExecution.new(self, context)
-		sequence_execution.connect("completed", self, "emit_signal", ["completed"], CONNECT_ONESHOT)
+		sequence_execution.connect("completed", self, "emit_signal", ["completed", sequence_execution], CONNECT_ONESHOT)
 		_run(sequence_execution)
 		return sequence_execution
 	return null

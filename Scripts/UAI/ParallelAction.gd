@@ -20,7 +20,7 @@ class ParallelActionExecution extends UAIAction.ActionExecution:
 func execute(context:UAIBehaviorContext) -> ActionExecution:
 	if actions.size():
 		var pending_execution = ParallelActionExecution.new(self, context)
-		pending_execution.connect("completed", self, "emit_signal", ["completed"], CONNECT_ONESHOT)
+		pending_execution.connect("completed", self, "emit_signal", ["completed", pending_execution], CONNECT_ONESHOT)
 		for action in actions:
 			pending_execution.add_action(action)
 		return pending_execution
