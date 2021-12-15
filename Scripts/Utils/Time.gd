@@ -123,8 +123,10 @@ func set_time(time:float):
 	subseconds = 0
 	add_seconds(time)
 	
-func _init(time:float):
-	set_time(time)
+func _init(time:float = 0):
+	# only set the time if it's not 0 since 0 is the default
+	if time:
+		set_time(time)
 
 func _to_string() -> String:
 	return "%ss %dm %dh %dD %dW %dM %dY" % [second + subseconds, minute, hour, day, week, month, year]
