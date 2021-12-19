@@ -125,7 +125,6 @@ func value_noise_2d(x:float, y:float, smoothing:float = 1.0, width:int = MAX_INT
 	var l2 = lerp(v3, v4, sx)
 	return clamp(lerp(l1, l2, sy), -1, 1)
 
-
 # Functions that modify state
 func randi() -> int:
 	var val = inoise(_state, _seed)
@@ -149,3 +148,18 @@ func randomize():
 
 func pick_rand(arr:Array):
 	return arr[self.randi() % arr.size()]
+
+func weighted_random(weights:PoolRealArray) -> int:
+	# Given an of array of weights, choose a random index
+	var total_weight:float = 0
+	var weight_sums:PoolRealArray
+	for w in weights:
+		total_weight += w
+		weight_sums.append(total_weight)
+	
+	var weight = self.rand_range(0,total_weight)
+	for i in weight_sums.size():
+		if weight <= weight_sums[i]:
+			return i
+	# this shouldn't ever happen, but we should cover the case
+	return 0
