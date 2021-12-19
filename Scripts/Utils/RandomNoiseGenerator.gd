@@ -152,14 +152,10 @@ func pick_rand(arr:Array):
 func weighted_random(weights:PoolRealArray) -> int:
 	# Given an of array of weights, choose a random index
 	var total_weight:float = 0
-	var weight_sums:PoolRealArray
+	var weight_sums:Array
 	for w in weights:
 		total_weight += w
 		weight_sums.append(total_weight)
 	
 	var weight = self.rand_range(0,total_weight)
-	for i in weight_sums.size():
-		if weight <= weight_sums[i]:
-			return i
-	# this shouldn't ever happen, but we should cover the case
-	return 0
+	return weight_sums.bsearch(weight, true)
