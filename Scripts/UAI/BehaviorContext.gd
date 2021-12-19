@@ -2,6 +2,7 @@ extends Reference
 class_name UAIBehaviorContext
 
 var behavior:Resource
+var history:Resource
 var behavior_score:Reference
 var blackboard:Resource
 var target_ref:WeakRef

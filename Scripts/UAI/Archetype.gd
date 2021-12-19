@@ -12,7 +12,7 @@ func set_behavior_sets(value:Array):
 			printerr("Archetypes can only contain BehaviorSets")
 
 
-func get_best_behaviors(agent, targets:Array, blackboard:UAIBlackboard, count:int = 1) -> Array:
+func get_best_behaviors(agent, targets:Array, blackboard:UAIBlackboard, history:UAIHistory, count:int = 1) -> Array:
 	var queue = PriorityQueue.new(false)
 	
 	var highest_priority:int = 0
@@ -39,6 +39,7 @@ func get_best_behaviors(agent, targets:Array, blackboard:UAIBlackboard, count:in
 				var context = UAIBehaviorContext.new()
 				context.behavior = behavior
 				context.blackboard = blackboard
+				context.history = history
 				context.target_ref = weakref(target)
 				context.agent_ref = weakref(agent)
 				

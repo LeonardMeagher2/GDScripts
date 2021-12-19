@@ -88,11 +88,13 @@ func _get_property_list():
 		usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_SCRIPT_VARIABLE
 	}]
 	for consideration in considerations:
-		res.append({
-			name = "consideration_weights/"+consideration.name,
-			type = TYPE_REAL,
-			hint = PROPERTY_HINT_RANGE,
-			hint_string = "0,1,0.01,true,consideration_weight_" + consideration.name,
-			usage = PROPERTY_USAGE_DEFAULT
-		})
+		consideration = consideration as UAIConsideration
+		if consideration:
+			res.append({
+				name = "consideration_weights/"+consideration.name,
+				type = TYPE_REAL,
+				hint = PROPERTY_HINT_RANGE,
+				hint_string = "0,1,0.01,true,consideration_weight_" + consideration.name,
+				usage = PROPERTY_USAGE_DEFAULT
+			})
 	return res
