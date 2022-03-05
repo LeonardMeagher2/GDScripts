@@ -3,30 +3,34 @@ class_name UAIParallelAction
 
 export(Array, Resource) var actions
 
-class ParallelActionExecution extends UAIAction.ActionExecution:
-	var count:int = 0
-	var all_succeeded:bool = true
-	
-	func add_action(action:UAIAction) -> void:
-		count += 1
-		var execution = action.execute(context)
+
+func _run(parallel_execution:ActionExecution):
+	var data:Dictionary = {
+		parallel_execution = parallel_execution,
+		all_succeeded = true
+	}
+	for action in actions:
+		var execution:ActionExecution = action.execute(parallel_execution.context)
 		if execution:
-			execution.connect("completed", self, "_async_action_completed", [execution], CONNECT_ONESHOT)
-	
-	func _async_action_completed(execution:UAIAction.ActionExecution) -> void:
-		count -= 1
-		if execution.status == execution.STATUS_FAILED:
-			all_succeeded = false
-		if count <= 0:
-			complete(all_succeeded)
+			parallel_execution.lock()
+			execution.connect("completed", self, "_async_action_completed", [data], CONNECT_ONESHOT)
+	# handle a case where all actions return null for executions
+	parallel_execution.call_deferred("complete")
+
+func _async_action_completed(data:Dictionary, execution:ActionExecution) -> void:
+	if data.all_scceeded:
+		data.all_succeeded = execution.status == execution.STATUS_SUCCEEDED
+	data.parallel_execution.unlock(data.all_succeeded)
 
 func execute(context:UAIBehaviorContext) -> ActionExecution:
 	if actions.size():
 		# not adding this the execution history since it doesn't actually do anything
-		var pending_execution = ParallelActionExecution.new(self, context)
-		pending_execution.connect("completed", self, "emit_signal", ["completed", pending_execution], CONNECT_ONESHOT)
-		for action in actions:
-			pending_execution.add_action(action)
-		return pending_execution
+		var parallel_execution = ActionExecution.new(self, context)
+		parallel_execution.connect("completed", self, "emit_signal", ["completed", parallel_execution], CONNECT_ONESHOT)
+		context.history.add_execution(parallel_execution)
+		emit_signal("executed", parallel_execution)
+		_run(parallel_execution)
+		
+		return parallel_execution
 	return null
 	

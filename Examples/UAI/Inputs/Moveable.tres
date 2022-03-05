@@ -1,0 +1,7 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Libs/UAI/inputs/ExpressionInput.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+expression = "\"global_transform\" in agent and \"global_transform\" in target and typeof(agent.global_transform) == typeof(target.global_transform)"

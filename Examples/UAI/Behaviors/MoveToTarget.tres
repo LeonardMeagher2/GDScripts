@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=6 format=2]
+
+[ext_resource path="res://Libs/UAI/Behavior.gd" type="Script" id=1]
+[ext_resource path="res://Prototypes/AI/Inputs/Moveable.tres" type="Resource" id=2]
+[ext_resource path="res://Prototypes/AI/Inputs/TargetIsOther.tres" type="Resource" id=3]
+[ext_resource path="res://Prototypes/AI/Actions/MoveToTarget.tres" type="Resource" id=5]
+[ext_resource path="res://Prototypes/AI/Considerations/PrioritizeFurtherTargets.tres" type="Resource" id=6]
+
+[resource]
+script = ExtResource( 1 )
+priority = 1
+weight = 1.0
+action = ExtResource( 5 )
+preconditions = [ ExtResource( 3 ), ExtResource( 2 ) ]
+considerations = [ ExtResource( 6 ) ]
+consideration_weights/PrioritizeFurtherTargets = 1

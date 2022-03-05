@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://Libs/UAI/Consideration.gd" type="Script" id=1]
+[ext_resource path="res://Prototypes/AI/Inputs/Distance.tres" type="Resource" id=2]
+
+[sub_resource type="Curve" id=1]
+_data = [ Vector2( 0, 1 ), 0.0, 0.0, 0, 0, Vector2( 1, 0 ), -2.96242, 0.0, 0, 0 ]
+
+[resource]
+script = ExtResource( 1 )
+response_curve = SubResource( 1 )
+input = ExtResource( 2 )
+minimum_value = 0.0
+maximum_value = 600.0
+wrap_value = false

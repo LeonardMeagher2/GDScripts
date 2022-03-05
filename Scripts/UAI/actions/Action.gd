@@ -1,6 +1,7 @@
 extends Resource
 class_name UAIAction
 
+signal executed(execution)
 signal completed(execution)
 
 var name:String setget set_name, get_name
@@ -22,15 +23,14 @@ class ActionExecution extends Reference:
 		STATUS_SUCCEEDED,
 		STATUS_FAILED
 	}
-	var name:String setget set_name,get_name
+	var _locks = 0
+	
+	var name:String setget ,get_name
 	var original_action:Resource
 	var context:UAIBehaviorContext
 	var created_at:float
 	var completed_at:float
 	var status = STATUS_PENDING
-	
-	func set_name(value:String):
-		return
 	
 	func get_name() -> String:
 		return original_action.get_name()
@@ -40,19 +40,43 @@ class ActionExecution extends Reference:
 		self.original_action = action
 		self.context = context
 	
-	func complete(success:bool = true) -> void:
+	func lock() -> void:
+		_locks += 1
+		
+	func unlock(succeeded:bool = true) -> void:
+		if status == STATUS_PENDING and _locks > 0:
+			_locks -= 1
+		else:
+			push_warning("Attempt to unlock UAIAction, when it was not locked!")
+		complete(succeeded)
+		
+	func cancel() -> bool:
 		if status == STATUS_PENDING:
-			status = STATUS_SUCCEEDED if success else STATUS_FAILED
+			# complete regardless if it is locked
+			status = STATUS_FAILED
 			completed_at = OS.get_ticks_msec()
-		call_deferred("emit_signal", "completed")
+			# deferred in case the task is cancelled before someone was able to yield for completed
+			call_deferred("emit_signal","completed")
+			return true
+		return false
+	
+	func complete(succeeded:bool = true) -> bool:
+		if not _locks and status == STATUS_PENDING:
+			status = STATUS_SUCCEEDED if succeeded else STATUS_FAILED
+			completed_at = OS.get_ticks_msec()
+			call_deferred("emit_signal", "completed")
+			return true
+		return false
+	
 
 func execute(context:UAIBehaviorContext) -> ActionExecution:
 	var execution = ActionExecution.new(self, context)
 	execution.connect("completed", self, "emit_signal", ["completed", execution], CONNECT_ONESHOT)
 	context.history.add_execution(execution)
 	
-	var agent = context.agent_ref.get_ref()
-	if agent and agent.has_method("do_action"):
-		agent.do_action(execution)
+	# Ai handlers should test to see if they are the agent
+	emit_signal("executed", execution)
+	# Attempt to complete the execution, in case nothing is actually going to handle the action
+	execution.call_deferred("complete")
 	
 	return execution

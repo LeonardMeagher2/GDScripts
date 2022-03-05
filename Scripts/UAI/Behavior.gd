@@ -2,12 +2,12 @@ tool
 extends Resource
 class_name UAIBehavior
 
-export(int, "Normal", "High") var priority:int = 0
+# Higher priority behaviors remove lower priority behaviors from the queue
+export(int, "Low", "Normal", "High") var priority:int = 1
 export var weight:float = 1.0
 export var action:Resource
 export(Array, Resource) var preconditions:Array
 export(Array, Resource) var considerations:Array setget set_considerations
-
 
 var consideration_weights = {}
 
