@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://8c8p6ajxbqxq"]
+
+[ext_resource type="Script" path="res://addons/planner/data/PlannerTask.gd" id="1_gl6lv"]
+
+[resource]
+script = ExtResource( "1_gl6lv" )
+done = true
+details = "Hey there"
+assignee = ""
+attachments = ["res://addons/planner/Planner.tscn"]

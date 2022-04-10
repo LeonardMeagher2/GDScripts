@@ -1,0 +1,6 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d2wpc2yppi8u1"]
+
+[ext_resource type="Script" path="res://addons/planner/data/PlannerContext.gd" id="1_qfljf"]
+
+[resource]
+script = ExtResource( "1_qfljf" )

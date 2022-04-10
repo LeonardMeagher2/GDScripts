@@ -1,0 +1,95 @@
+[gd_scene load_steps=7 format=3 uid="uid://cm7v2t0dqpggh"]
+
+[ext_resource type="Script" path="res://addons/planner/components/Task/Task.gd" id="1_bgklu"]
+[ext_resource type="Resource" uid="uid://8c8p6ajxbqxq" path="res://addons/planner/test_task.tres" id="2_j1e0m"]
+[ext_resource type="Texture2D" uid="uid://ct0dircg24lpd" path="res://addons/planner/icons/Clear.svg" id="3_3lbix"]
+[ext_resource type="Script" path="res://addons/planner/components/Task/RemoveAttachment.gd" id="3_ngu7e"]
+[ext_resource type="Script" path="res://addons/planner/components/Task/TextEdit.gd" id="5_ca20s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ixh7y"]
+bg_color = Color(0.0784314, 0.0784314, 0.0784314, 0.00392157)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.12549, 0.12549, 0.12549, 1)
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+shadow_color = Color(0, 0, 0, 0.180392)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[node name="Task" type="PanelContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = SubResource( "StyleBoxFlat_ixh7y" )
+script = ExtResource( "1_bgklu" )
+task = ExtResource( "2_j1e0m" )
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 191.0
+offset_bottom = 144.0
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 186.0
+offset_bottom = 139.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+offset_right = 182.0
+offset_bottom = 100.0
+
+[node name="Done" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+offset_right = 24.0
+offset_bottom = 31.0
+size_flags_vertical = 2
+button_pressed = true
+
+[node name="TextEdit" type="TextEdit" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+minimum_size = Vector2(100, 100)
+offset_left = 28.0
+offset_right = 182.0
+offset_bottom = 100.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Wow asdasdasdasd"
+wrap_mode = 1
+highlight_all_occurrences = true
+scroll_smooth = true
+caret_blink = true
+script = ExtResource( "5_ca20s" )
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+offset_top = 104.0
+offset_right = 182.0
+offset_bottom = 135.0
+
+[node name="ClearAttachments" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+offset_right = 24.0
+offset_bottom = 31.0
+icon = ExtResource( "3_3lbix" )
+script = ExtResource( "3_ngu7e" )
+
+[node name="Attachments" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+minimum_size = Vector2(0, 15)
+offset_left = 28.0
+offset_right = 182.0
+offset_bottom = 31.0
+size_flags_horizontal = 3
+mouse_filter = 2
+alignment = 2
+
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/Done" to="." method="_on_done_toggled"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/HBoxContainer/TextEdit" to="." method="_on_text_edit_text_changed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/ClearAttachments" to="." method="_on_remove_attachment_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/Attachments/AttachmentButton" to="MarginContainer/VBoxContainer/HBoxContainer2/Attachments/AttachmentButton" method="_on_attachment_button_pressed"]

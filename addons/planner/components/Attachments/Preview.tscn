@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://4cljgm7eqj1p"]
+
+[ext_resource type="Script" path="res://addons/planner/components/Attachments/Preview.gd" id="1_toje1"]
+
+[node name="Preview" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource( "1_toje1" )
+path = ""
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_bottom = 40.0
+stretch_mode = 3
+
+[node name="Label" type="Label" parent="."]
+offset_left = 4.0
+offset_top = 8.0
+offset_right = 5.0
+offset_bottom = 31.0
